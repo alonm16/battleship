@@ -9,8 +9,7 @@ class Human(Player):
     def __init__(self):
         super().__init__()
 
-    def __legal(self, location, direction, battleship_size):
-        x, y = int(location[0]), int(location[1])
+    def __legal(self, x, y, direction, battleship_size):
         if direction not in ['horizontal', 'vertical'] or not 0 <= x < 10 or not 0 <= y < 10 \
                 or not 1 <= battleship_size <= 5:
             return False
@@ -28,16 +27,36 @@ class Human(Player):
                 if self.battleships_set != Human.set1 and self.battleships_set != Human.set2:
                     self.battleships_set = {}
                     self.player_board = np.zeros((10, 10), dtype=int)
+                    self.available_places = [(i, j) for i in range(10) for j in range(10)]
                     print("incorrect board placement, please try place all battleships again\n")
                     continue
                 break
             start_point, direction, battleship_size = location.split()
-            start_x, start_y = start_point.split(',')
             battleship_size = int(battleship_size)
-            if not self.__legal(start_point, direction, battleship_size):
-                print("incorrect placement, please try  again\n")
+            start_x, start_y = start_point.split(',')
+            start_x, start_y = int(start_x), int(start_y)
+            if not self.__legal(start_x, start_y, direction, battleship_size):
+                print("incorrect placement, please try  again")
                 continue
 
-            self.place_battleship(direction, start_x, start_y, battleship_size)
+            self._place_battleship(direction, start_x, start_y, battleship_size)
             self.battleships_set[battleship_size] = self.battleships_set.get(battleship_size, 0) + 1
             print(self.player_board)
+
+    def turn(self, opponent: Player):
+        while True:
+            location = tuple(input("\nEnter place to shoot: ").split(','))
+            if location not in self.opponent_available_places:
+                print('location already chosen')
+                continue
+            self.opponent_available_places.remove(location)
+            result = opponent.hit(location)
+            if result == 'hit':
+                self.opponent_board[location] = 1
+                print('a hit!\n opponent board:\n')
+                print(self.opponent_board)
+                continue
+            elif result == 'miss':
+                self.opponent_board[location] = -1
+                print('missed!')
+            return result

@@ -3,14 +3,14 @@ from abc import ABC, abstractmethod
 
 
 class Player(ABC):
-    set1 = {5: 1, 4: 1, 3: 2, 2: 1}
-    set2 = {4: 1, 3: 2, 2: 3, 1: 4}
 
     def __init__(self):
         self.player_board = np.zeros((10, 10), dtype=int)
         self.opponent_board = np.zeros((10, 10), dtype=int)
+        self.opponent_available_places = [(i, j) for i in range(10) for j in range(10)]
         self.battleships_set = {}
         self.available_places = [(i, j) for i in range(10) for j in range(10)]
+        self.total_possible_hits = 0
 
     def remove(self, x, y):
         try:
@@ -42,7 +42,7 @@ class Player(ABC):
             self.remove(x, y+1)
             self.remove(x, y-1)
 
-    def place_battleship(self, direction, start_x, start_y, battleship_size):
+    def _place_battleship(self, direction, start_x, start_y, battleship_size):
         if direction == 'horizontal':
             for y in range(start_y, start_y + battleship_size):
                 self.player_board[start_x, y] = 1
@@ -56,3 +56,14 @@ class Player(ABC):
     @abstractmethod
     def place_battleships(self):
         pass
+
+    @abstractmethod
+    def turn(self, opponent):
+        pass
+
+    def hit(self, location):
+        if self.player_board[location] == 1:
+            self.player_board[location] = 2
+            self.total_possible_hits -= 1
+            return 'win' if self.total_possible_hits == 0 else 'hit'
+        return 'miss'

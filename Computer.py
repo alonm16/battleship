@@ -10,6 +10,7 @@ class Computer(Player):
     def __init__(self):
         super().__init__()
         self.battleships_set = random.choice([Computer.set1, Computer.set2])
+        self.total_possible_hits = sum([key*self.battleships_set[key] for key in self.battleships_set.keys()])
 
     def get_start_point(self, battleship_size, direction):
         problem = True
@@ -30,5 +31,15 @@ class Computer(Player):
                 self.battleships_set[battleship_size] -= 1
                 direction = random.choice(['vertical', 'horizontal'])
                 start_x, start_y = self.get_start_point(battleship_size, direction)
-                self.place_battleship(direction, start_x, start_y, battleship_size)
-        print(self.player_board)
+                self._place_battleship(direction, start_x, start_y, battleship_size)
+
+    def turn(self, opponent: Player):
+        while True:
+            location = random.choice(self.opponent_available_places)
+            self.opponent_available_places.remove(location)
+            result = opponent.hit(location)
+            if result == 'hit':
+                print('The opponent hit your battleship!\n')
+                print(opponent.player_board)
+                continue
+            return result
