@@ -76,7 +76,8 @@ class Player(ABC):
             self.player_board[location] = 'X'
             self.total_possible_hits -= 1
             if self.check_drowned(location[0], location[1]):
-                print('ship was drowned!')
+                print('ship sank!')
+                return 'win' if self.total_possible_hits == 0 else 'sank'
             return 'win' if self.total_possible_hits == 0 else 'hit'
         return 'miss'
 

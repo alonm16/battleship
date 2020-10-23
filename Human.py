@@ -61,9 +61,9 @@ class Human(Player):
                 continue
             self.opponent_available_places.remove(location)
             result = opponent.hit(location)
-            if result == 'hit':
+            if result == 'hit' or result == 'sank':
                 self.opponent_board[location] = 'X'
-                print('a hit!\n')
+                print('hit!\n')
                 continue
             elif result == 'miss':
                 self.opponent_board[location] = 'M'
