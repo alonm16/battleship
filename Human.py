@@ -1,5 +1,5 @@
 import numpy as np
-from Player import Player
+from Player import Player, in_bounds
 
 
 class Human(Player):
@@ -10,8 +10,7 @@ class Human(Player):
         super().__init__()
 
     def __legal(self, x, y, direction, battleship_size):
-        if direction not in ['horizontal', 'vertical'] or not 0 <= x < 10 or not 0 <= y < 10 \
-                or not 1 <= battleship_size <= 5:
+        if direction not in ['horizontal', 'vertical'] or not in_bounds((x, y)) or not 1 <= battleship_size <= 5:
             return False
         horizontal_offset = 1 if direction == 'horizontal' else 0
         vertical_offset = 1 if direction == 'vertical' else 0
@@ -22,19 +21,24 @@ class Human(Player):
 
     def place_battleships(self):
         while True:
-            location = input("\nenter battleship point, direction and size: ")
+            location = input("\nenter battleship point, direction and size: \n")
             if location.lower() == 'done':
                 if self.battleships_set != Human.set1 and self.battleships_set != Human.set2:
                     self.battleships_set = {}
-                    self.player_board = np.zeros((10, 10), dtype=int)
+                    self.player_board = np.full((10, 10), ' ')
                     self.available_places = [(i, j) for i in range(10) for j in range(10)]
                     print("incorrect board placement, please try place all battleships again\n")
                     continue
                 break
-            start_point, direction, battleship_size = location.split()
-            battleship_size = int(battleship_size)
-            start_x, start_y = start_point.split(',')
-            start_x, start_y = int(start_x), int(start_y)
+            try:
+                start_point, direction, battleship_size = location.split()
+                battleship_size = int(battleship_size)
+                start_x, start_y = start_point.split(',')
+                start_x, start_y = int(start_x), int(start_y)
+            except:
+                print('please enter valid parameters')
+                continue
+
             if not self.__legal(start_x, start_y, direction, battleship_size):
                 print("incorrect placement, please try  again")
                 continue
@@ -45,18 +49,23 @@ class Human(Player):
 
     def turn(self, opponent: Player):
         while True:
-            location = tuple(input("\nEnter place to shoot: ").split(','))
+            self.print_boards()
+            try:
+                location = input("\nEnter place to shoot: ").split(',')
+                location = (int(location[0]), int(location[1]))
+            except:
+                print('please enter a valid location\n')
+                continue
             if location not in self.opponent_available_places:
-                print('location already chosen')
+                print('location already chosen\n')
                 continue
             self.opponent_available_places.remove(location)
             result = opponent.hit(location)
             if result == 'hit':
-                self.opponent_board[location] = 1
-                print('a hit!\n opponent board:\n')
-                print(self.opponent_board)
+                self.opponent_board[location] = 'X'
+                print('a hit!\n')
                 continue
             elif result == 'miss':
-                self.opponent_board[location] = -1
-                print('missed!')
+                self.opponent_board[location] = 'M'
+                print('missed!\n')
             return result
