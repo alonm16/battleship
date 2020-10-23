@@ -16,6 +16,7 @@ class Player(ABC):
         self.battleships_set = {}
         self.available_places = [(i, j) for i in range(10) for j in range(10)]
         self.total_possible_hits = 0
+        self.ships_position = []
 
     def remove(self, x, y):
         try:
@@ -48,15 +49,19 @@ class Player(ABC):
             self.remove(x, y-1)
 
     def _place_battleship(self, direction, start_x, start_y, battleship_size):
+        battleship_location = []
         if direction == 'horizontal':
             for y in range(start_y, start_y + battleship_size):
                 self.player_board[start_x, y] = 'S'
+                battleship_location.append((start_x, y))
             self.remove_horizontal(start_x, start_y, battleship_size)
 
         else:
             for x in range(start_x, start_x + battleship_size):
                 self.player_board[x, start_y] = 'S'
+                battleship_location.append((x, start_y))
             self.remove_vertical(start_x, start_y, battleship_size)
+        self.ships_position.append(battleship_location)
 
     @abstractmethod
     def place_battleships(self):
@@ -66,17 +71,17 @@ class Player(ABC):
     def turn(self, opponent):
         pass
 
-    def check_drowned(self, x, y):
-        adjacent = [(x-1, y), (x-1, y-1), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y), (x+1, y-1), (x+1, y+1)]
-        adjacent = list(filter(in_bounds, adjacent))
-        return all(self.player_board[location] != 'S' for location in adjacent)
+    def check_drowned(self, location):
+        for ship_position in self.ships_position:
+            if location in ship_position:
+                return all(self.player_board[pos] == 'X' for pos in ship_position)
+        return False
 
     def hit(self, location):
         if self.player_board[location] == 'S':
             self.player_board[location] = 'X'
             self.total_possible_hits -= 1
-            if self.check_drowned(location[0], location[1]):
-                print('ship sank!')
+            if self.check_drowned(location):
                 return 'win' if self.total_possible_hits == 0 else 'sank'
             return 'win' if self.total_possible_hits == 0 else 'hit'
         return 'miss'

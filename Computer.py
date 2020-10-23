@@ -35,17 +35,29 @@ class Computer(Player):
                 self._place_battleship(direction, start_x, start_y, battleship_size)
 
     def hard_mode(self, x, y):
-        if 0 < x < 9 and self.opponent_board[(x+1, y)] == 'X' and self.opponent_board[(x-1, y)] == ' ':
-            return x-1, y
-        elif 0 < x < 9 and self.opponent_board[(x-1, y)] == 'X' and self.opponent_board[(x+1, y)] == ' ':
-            return x+1, y
-        elif 0 < y < 9 and self.opponent_board[(x, y+1)] == 'X' and self.opponent_board[(x, y-1)] == ' ':
-            return x, y-1
-        elif 0 < y < 9 and self.opponent_board[(x, y-1)] == 'X' and self.opponent_board[(x, y+1)] == ' ':
-            return x, y+1
-        moves = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
-        moves = list(filter(lambda location: in_bounds(location) and location in self.opponent_available_places, moves))
-        return random.choice(moves)
+        horizontal = [self.opponent_board[location] for location in (filter(in_bounds, [(x, y+1), (x, y-1)]))]
+        adjacent_x = x
+        if 'X' not in horizontal:
+            while adjacent_x < 9 and self.opponent_board[adjacent_x, y] == 'X':
+                adjacent_x += 1
+            if self.opponent_board[adjacent_x, y] == ' ':
+                return adjacent_x, y
+            adjacent_x = x
+            while adjacent_x > 0 and self.opponent_board[adjacent_x, y] == 'X':
+                adjacent_x -= 1
+            if self.opponent_board[adjacent_x, y] == ' ':
+                return adjacent_x, y
+
+        adjacent_y = y
+        while adjacent_y < 9 and self.opponent_board[x, adjacent_y] == 'X':
+            adjacent_y += 1
+        if self.opponent_board[x, adjacent_y] == ' ':
+            return x, adjacent_y
+        adjacent_y = y
+        while adjacent_y > 0 and self.opponent_board[x, adjacent_y] == 'X':
+            adjacent_y -= 1
+        if self.opponent_board[x, adjacent_y] == ' ':
+            return x, adjacent_y
 
     def turn(self, opponent: Player):
         while True:
@@ -62,6 +74,8 @@ class Computer(Player):
             elif result == 'sank':
                 self.last_hit = None
                 self.opponent_board[location] = 'X'
+                print('Opponent sank your battleship!\n')
+                print(opponent.player_board)
             elif result == 'hit':
                 self.last_hit = location
                 self.opponent_board[location] = 'X'
@@ -69,4 +83,3 @@ class Computer(Player):
                 print(opponent.player_board)
             else:
                 return result
-

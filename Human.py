@@ -61,7 +61,10 @@ class Human(Player):
                 continue
             self.opponent_available_places.remove(location)
             result = opponent.hit(location)
-            if result == 'hit' or result == 'sank':
+            if result == 'sank':
+                print('ship sank!')
+                self.opponent_board[location] = 'X'
+            elif result == 'hit' or result == 'sank':
                 self.opponent_board[location] = 'X'
                 print('hit!\n')
                 continue
