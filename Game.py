@@ -1,5 +1,9 @@
 from Human import Human
 from Computer import Computer
+import socket
+import numpy
+
+FORMAT = 'utf-8'
 
 
 class Game:
@@ -25,3 +29,15 @@ class Game:
             if result == 'win':
                 print('player 1 has won!')
                 return
+
+    def multiplayer(self):
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.bind((socket.gethostname(), 1234))
+        server.listen(1)
+        conn, addr = server.accept()
+        self.player1 = Human()
+
+        conn.send(bytes('1' + 'hello', FORMAT))
+        conn.send(bytes('0' + 'hello', FORMAT))
+
+

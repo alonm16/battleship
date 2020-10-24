@@ -87,7 +87,7 @@ class Player(ABC):
         return 'miss'
 
     def print_boards(self):
-        print('player board:' + '\t' * 10 + 'opponent board:')
+        boards = 'player board:' + '\t' * 10 + 'opponent board:' + '\n'
         for r1, r2 in zip(self.player_board, self.opponent_board):
-            print(r1, end='\t' * 3)
-            print(r2)
+            boards += str(r1) + 3*'\t' + str(r2) + '\n'
+        print(boards)
