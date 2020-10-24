@@ -30,20 +30,25 @@ class Game:
                 return
 
     def multi_player(self):
+        self.player0.output('waiting for another player...')
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((socket.gethostname(), 1234))
         server.listen(1)
         conn, addr = server.accept()
         self.player1 = Human(conn)
+        self.player1.output('waiting for opponent to place battleships...')
         self.player0.place_battleships()
+        self.player0.output('waiting for opponent to place battleships...')
         self.player1.place_battleships()
         while True:
+            self.player1.output('Opponent\'s turn:')
             result = self.player0.turn(self.player1)
             if result == 'win':
                 self.player0.output('player 0 has won!')
                 self.player1.output('player 0 has won!')
                 return
 
+            self.player0.output('Opponent\'s turn:')
             result = self.player1.turn(self.player0)
             if result == 'win':
                 self.player0.output('player 1 has won!')

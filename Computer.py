@@ -1,6 +1,8 @@
 import random
 from Player import Player, in_bounds
 
+BOARD_SIZE = 10
+
 
 class Computer(Player):
     set1 = {5: 1, 4: 1, 3: 2, 2: 1}
@@ -38,7 +40,7 @@ class Computer(Player):
         horizontal = [self.opponent_board[location] for location in (filter(in_bounds, [(x, y+1), (x, y-1)]))]
         adjacent_x = x
         if 'X' not in horizontal:
-            while adjacent_x < 9 and self.opponent_board[adjacent_x, y] == 'X':
+            while adjacent_x < BOARD_SIZE-1 and self.opponent_board[adjacent_x, y] == 'X':
                 adjacent_x += 1
             if self.opponent_board[adjacent_x, y] == ' ':
                 return adjacent_x, y
@@ -49,7 +51,7 @@ class Computer(Player):
                 return adjacent_x, y
 
         adjacent_y = y
-        while adjacent_y < 9 and self.opponent_board[x, adjacent_y] == 'X':
+        while adjacent_y < BOARD_SIZE-1 and self.opponent_board[x, adjacent_y] == 'X':
             adjacent_y += 1
         if self.opponent_board[x, adjacent_y] == ' ':
             return x, adjacent_y
@@ -61,7 +63,7 @@ class Computer(Player):
 
     def turn(self, opponent: Player):
         while True:
-            if self.mode == 'hard' and self.last_hit != None:
+            if self.mode == 'hard' and self.last_hit:
                 location = self.hard_mode(self.last_hit[0], self.last_hit[1])
             else:
                 location = random.choice(self.opponent_available_places)

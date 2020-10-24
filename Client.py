@@ -13,5 +13,3 @@ while True:
     if header == '1':
         to_send = input()
         s.send(bytes(to_send, FORMAT))
-
-

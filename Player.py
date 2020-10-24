@@ -1,20 +1,22 @@
 import numpy as np
 from abc import ABC, abstractmethod
 
+BOARD_SIZE = 10
+
 
 def in_bounds(location):
     x, y = location[0], location[1]
-    return 0 <= x < 10 and 0 <= y < 10
+    return 0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE
 
 
 class Player(ABC):
 
     def __init__(self):
-        self.player_board = np.full((10, 10), ' ')
-        self.opponent_board = np.full((10, 10), ' ')
-        self.opponent_available_places = [(i, j) for i in range(10) for j in range(10)]
+        self.player_board = np.full((BOARD_SIZE, BOARD_SIZE), ' ')
+        self.opponent_board = np.full((BOARD_SIZE, BOARD_SIZE), ' ')
+        self.opponent_available_places = [(i, j) for i in range(BOARD_SIZE) for j in range(BOARD_SIZE)]
         self.battleships_set = {}
-        self.available_places = [(i, j) for i in range(10) for j in range(10)]
+        self.available_places = [(i, j) for i in range(BOARD_SIZE) for j in range(BOARD_SIZE)]
         self.total_possible_hits = 0
         self.ships_position = []
 

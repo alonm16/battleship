@@ -1,7 +1,9 @@
 import numpy as np
 from Player import Player, in_bounds
 import socket
+
 FORMAT = 'utf-8'
+BOARD_SIZE = 10
 
 
 class Human(Player):
@@ -11,12 +13,12 @@ class Human(Player):
     def __init__(self, conn: socket.socket = None):
         super().__init__()
         self.conn = conn
-        if conn != None:
-            self.input = self.__normal_input
-            self.output = self.__normal_output
-        else:
+        if conn:
             self.input = self.__socket_input
             self.output = self.__socket_output
+        else:
+            self.input = self.__normal_input
+            self.output = self.__normal_output
 
     def __normal_output(self, msg):
         print(msg)
@@ -47,8 +49,8 @@ class Human(Player):
             if location.lower() == 'done':
                 if self.battleships_set != Human.set1 and self.battleships_set != Human.set2:
                     self.battleships_set = {}
-                    self.player_board = np.full((10, 10), ' ')
-                    self.available_places = [(i, j) for i in range(10) for j in range(10)]
+                    self.player_board = np.full((BOARD_SIZE, BOARD_SIZE), ' ')
+                    self.available_places = [(i, j) for i in range(BOARD_SIZE) for j in range(BOARD_SIZE)]
                     self.output("incorrect board placement, please try place all battleships again\n")
                     continue
                 break
@@ -67,7 +69,9 @@ class Human(Player):
 
             self._place_battleship(direction, start_x, start_y, battleship_size)
             self.battleships_set[battleship_size] = self.battleships_set.get(battleship_size, 0) + 1
-            self.output(self.player_board)
+            self.output('\n' + str(self.player_board))
+            if self.battleships_set == Human.set1 or self.battleships_set == Human.set2:
+                return
 
     def print_boards(self):
         boards = 'player board:' + '\t' * 10 + 'opponent board:' + '\n'
@@ -92,11 +96,17 @@ class Human(Player):
             if result == 'sank':
                 self.output('ship sank!')
                 self.opponent_board[location] = 'X'
-            elif result == 'hit' or result == 'sank':
+                opponent.output('Opponent hit your battleship!\n\n' + str(opponent.player_board)) \
+                    if isinstance(opponent, Human) else None
+                continue
+            elif result == 'hit':
                 self.opponent_board[location] = 'X'
                 self.output('hit!\n')
+                opponent.output('Opponent hit your battleship!\n\n' + str(opponent.player_board)) \
+                    if isinstance(opponent, Human) else None
                 continue
             elif result == 'miss':
                 self.opponent_board[location] = 'M'
                 self.output('missed!\n')
+                opponent.output('Opponent missed!\n') if isinstance(opponent, Human) else None
             return result
