@@ -16,6 +16,7 @@ class Computer(Player):
         self.total_possible_hits = sum([key*self.battleships_set[key] for key in self.battleships_set.keys()])
 
     def get_start_point(self, battleship_size, direction):
+        """chooses a location for placing a battleship randomly"""
         problem = True
         horizontal_offset = 1 if direction == 'horizontal' else 0
         vertical_offset = 1 if direction == 'vertical' else 0
@@ -36,7 +37,9 @@ class Computer(Player):
                 start_x, start_y = self.get_start_point(battleship_size, direction)
                 self._place_battleship(direction, start_x, start_y, battleship_size)
 
-    def hard_mode(self, x, y):
+    def hard_mode(self):
+        x, y = self.last_hit[0], self.last_hit[1]
+        """if game mode is hard, ensures that the computer will continue to shoot a battleship it hit previously"""
         horizontal = [self.opponent_board[location] for location in (filter(in_bounds, [(x, y+1), (x, y-1)]))]
         adjacent_x = x
         if 'X' not in horizontal:
@@ -64,7 +67,7 @@ class Computer(Player):
     def turn(self, opponent: Player):
         while True:
             if self.mode == 'hard' and self.last_hit:
-                location = self.hard_mode(self.last_hit[0], self.last_hit[1])
+                location = self.hard_mode()
             else:
                 location = random.choice(self.opponent_available_places)
             self.opponent_available_places.remove(location)

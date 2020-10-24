@@ -7,10 +7,14 @@ BOARD_SIZE = 10
 
 
 class Human(Player):
+    """options for battleships size and quantity"""
     set1 = {5: 1, 4: 1, 3: 2, 2: 1}
     set2 = {4: 1, 3: 2, 2: 3, 1: 4}
 
     def __init__(self, conn: socket.socket = None):
+        """
+        :param conn: socket to communicate with the second player
+        """
         super().__init__()
         self.conn = conn
         if conn:
@@ -27,13 +31,18 @@ class Human(Player):
         return input(msg)
 
     def __socket_output(self, msg):
+        """0 at start of message means only to read"""
         self.conn.send(bytes('0' + msg, FORMAT))
 
     def __socket_input(self, msg):
+        """1 at start of message means to write as well"""
         self.conn.send(bytes('1' + msg, FORMAT))
         return self.conn.recv(128).decode(FORMAT)
 
     def __legal(self, x, y, direction, battleship_size):
+        """
+        checks if input is valid and the location is available for placing battleship
+        """
         if direction not in ['horizontal', 'vertical'] or not in_bounds((x, y)) or not 1 <= battleship_size <= 5:
             return False
         horizontal_offset = 1 if direction == 'horizontal' else 0
@@ -74,6 +83,7 @@ class Human(Player):
                 return
 
     def print_boards(self):
+        """print the player board and known opponent board for the player"""
         boards = 'player board:' + '\t' * 10 + 'opponent board:' + '\n'
         for r1, r2 in zip(self.player_board, self.opponent_board):
             boards += str(r1) + 3*'\t' + str(r2) + '\n'

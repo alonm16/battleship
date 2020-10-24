@@ -11,6 +11,10 @@ class Game:
         self.player1 = None
 
     def single_player(self):
+        """
+        single player game against the computer, with option for easy/hard mode
+        :return:
+        """
         mode = input('Choose game mode (easy/hard): ').lower()
         while mode not in ['easy', 'hard']:
             mode = input('please enter a valid input: ')
@@ -30,6 +34,10 @@ class Game:
                 return
 
     def multi_player(self):
+        """
+        multiplayer game, the second player can join through running SecondPlayer.py
+        :return:
+        """
         self.player0.output('waiting for another player...')
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((socket.gethostname(), 1234))
