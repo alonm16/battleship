@@ -86,8 +86,4 @@ class Player(ABC):
             return 'win' if self.total_possible_hits == 0 else 'hit'
         return 'miss'
 
-    def print_boards(self):
-        boards = 'player board:' + '\t' * 10 + 'opponent board:' + '\n'
-        for r1, r2 in zip(self.player_board, self.opponent_board):
-            boards += str(r1) + 3*'\t' + str(r2) + '\n'
-        print(boards)
+
